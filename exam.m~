@@ -38,7 +38,7 @@ sigopt=cell(11);
 C = cell(11,1);
 for i=1:11
   [xopt{i}, muopt{i}, sigopt{i}]  = highest_slope_portfolio( ycorrs{i}, RF, ymeans{i}, ystds{i} );
-  figure(i);
+  [xopt2{i}, muopt{i}, sigopt{i}]  = highest_slope_portfolio( ycorrs{i}, 0.02, ymeans{i}, ystds{i} );
   hold on;
   plot (sigopt{i}, muopt{i} , 'x');
   hold on;
@@ -46,26 +46,22 @@ for i=1:11
   opt1_p = [.01  muopt{i} (2 * muopt{i} - RF) ];
   line(RF_p1, opt1_p  );
   C{i}=diag(ystds{i})*ycorrs{i}*diag(ystds{i});
-  [xopt2{i}, muopt{i}, sigopt{i}]  = highest_slope_portfolio( ycorrs{i}, 0.02, ymeans{i}, ystds{i} );
-  hold off;
 end
-
-large_n = 100;
-k = 20;
-mu_p = zeros(4, 4*k* large_n + 1);
-std_p = zeros(4, 4*k* large_n + 1);
-
-for j=1:11
-    for i = -2*k* large_n:1:2 * 2*k*large_n
-        curr_port = i / large_n * xopt2{j} + (1 - i / large_n) * xopt{j};
-        mu_p (j, i + 2*k * large_n + 1) = curr_port' * ymeans{j};
-        std_p(j, i + 2*k * large_n + 1) = sqrt(curr_port' * C{j} * curr_port);
-        
-    end
-    figure(j)
-    hold on;
-    plot( std_p(j,:), mu_p(j,:));
-    hold off;
-end
+% 
+% large_n = 100;
+% k = 20;
+% mu_p = zeros(4, 4*k* large_n + 1);
+% std_p = zeros(4, 4*k* large_n + 1);
+% 
+% for j=1:11
+%     for i = -2*k* large_n:1:2 * 2*k*large_n
+%         curr_port = i / large_n * xopt2{j} + (1 - i / large_n) * xopt{j};
+%         mu_p (j, i + 2*k * large_n + 1) = curr_port' * ymeans{j};
+%         std_p(j, i + 2*k * large_n + 1) = sqrt(curr_port' * C{j} * curr_port);
+%         
+%     end
+%     hold on;
+%     plot( std_p(j,:), mu_p(j,:));
+% end
 
 
