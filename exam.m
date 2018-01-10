@@ -44,7 +44,7 @@ for i=1:11
   opt1_p = [.01  muopt(i) (2 * muopt(i) - RF) ];
   line(RF_p1, opt1_p  );
   C{i}=diag(ystds{i})*ycorrs{i}*diag(ystds{i});
-  [xopt2{i}, muopt(i), sigopt(i)]  = highest_slope_portfolio( ycorrs{i}, 0.02, ymeans{i}, ystds{i} );
+  [xopt2{i}, muopt2(i), sigopt2(i)]  = highest_slope_portfolio( ycorrs{i}, 0.02, ymeans{i}, ystds{i} );
   hold off;
 end
 
@@ -70,7 +70,7 @@ c=0.1;
 v=zeros(1,11);
 
 for i=1:11
-    sym x;
+    syms x;
    v(i)=solve([x*RF+(1-x)*muopt(i)==0.1], x);
 end
 
@@ -80,9 +80,12 @@ for i=1:11
         if (j<=7)
         portf(i,j)=v(i)*xopt{i}(j);
         else
-        portf(i,j)=v(i)*RF;
+        portf(i,j)=v(i);
         end
     end
 end
-        
+to=zeros(1,11)
+for i=1:10
+    to(i)=abs(sum(portf(i,:)-portf(i+1,:)*100));
+end
 
