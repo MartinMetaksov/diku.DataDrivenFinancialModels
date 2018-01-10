@@ -4,7 +4,7 @@ if ~exist('stocks', 'var')
     % Microsoft, Boeing, Bank of America, Exxon Mobil, UnitedHealth Group,
     % Pepsico, NextEra Energy
     tickers = {'MSFT' 'BA' 'BAC' 'XOM' 'UNH' 'PEP' 'NEE'};
-
+    
     stocks = hist_stock_data('01011998', '01012018', tickers, 'frequency', 'mo');
 end
 
@@ -35,17 +35,17 @@ muopt = zeros(11,1);
 sigopt = zeros(11,1);
 C = cell(11,1);
 for i=1:11
-  [xopt{i}, muopt(i), sigopt(i)]  = highest_slope_portfolio( ycorrs{i}, RF, ymeans{i}, ystds{i} );
-  subplot(4,3,i);
-  hold on;
-  title(i)
-  plot (sigopt(i), muopt(i) , 'x');
-  RF_p1 = [0 sigopt(i) 2* sigopt(i)];
-  opt1_p = [.01  muopt(i) (2 * muopt(i) - RF) ];
-  line(RF_p1, opt1_p  );
-  C{i}=diag(ystds{i})*ycorrs{i}*diag(ystds{i});
-  [xopt2{i}, muopt2(i), sigopt2(i)]  = highest_slope_portfolio( ycorrs{i}, 0.02, ymeans{i}, ystds{i} );
-  hold off;
+    [xopt{i}, muopt(i), sigopt(i)]  = highest_slope_portfolio( ycorrs{i}, RF, ymeans{i}, ystds{i} );
+    subplot(4,3,i);
+    hold on;
+    title(i)
+    plot (sigopt(i), muopt(i) , 'x');
+    RF_p1 = [0 sigopt(i) 2* sigopt(i)];
+    opt1_p = [.01  muopt(i) (2 * muopt(i) - RF) ];
+    line(RF_p1, opt1_p  );
+    C{i}=diag(ystds{i})*ycorrs{i}*diag(ystds{i});
+    [xopt2{i}, muopt2(i), sigopt2(i)]  = highest_slope_portfolio( ycorrs{i}, 0.02, ymeans{i}, ystds{i} );
+    hold off;
 end
 
 large_n = 100;
@@ -71,20 +71,20 @@ v=zeros(1,11);
 
 for i=1:11
     syms x;
-   v(i)=solve([x*RF+(1-x)*muopt(i)==0.1], x);
+    v(i)=solve(x*RF+(1-x)*muopt(i)==0.1, x);
 end
 
 portf=zeros(11,8);
 for i=1:11
     for j=1:8
         if (j<=7)
-        portf(i,j)=v(i)*xopt{i}(j);
+            portf(i,j)=v(i)*xopt{i}(j);
         else
-        portf(i,j)=v(i);
+            portf(i,j)=v(i);
         end
     end
 end
-to=zeros(1,11)
+to=zeros(1,11);
 for i=1:10
     to(i)=abs(sum(portf(i,:)-portf(i+1,:)*100));
 end
