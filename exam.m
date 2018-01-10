@@ -84,8 +84,10 @@ for i=1:11
         end
     end
 end
-to=zeros(1,11);
+to=zeros(1,10);
 for i=1:10
     to(i)=abs(sum(portf(i,:)-portf(i+1,:)*100));
 end
+
+disp(['Average portfolio turnover is ', num2str(mean(to))]);
 
