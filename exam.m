@@ -66,4 +66,23 @@ for j=1:11
     hold off;
 end
 
+c=0.1;
+v=zeros(1,11);
+
+for i=1:11
+    sym x;
+   v(i)=solve([x*RF+(1-x)*muopt(i)==0.1], x);
+end
+
+portf=zeros(11,8);
+for i=1:11
+    for j=1:8
+        if (j<=7)
+        portf(i,j)=v(i)*xopt{i}(j);
+        else
+        portf(i,j)=v(i)*RF;
+        end
+    end
+end
+        
 
