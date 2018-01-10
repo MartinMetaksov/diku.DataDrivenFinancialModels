@@ -69,26 +69,24 @@ for j=1:11
 end
 
 c=0.1;
-v=zeros(1,11);
+portf=zeros(11,8);
 
 for i=1:11
     syms x;
-    v(i)=solve(x*RF+(1-x)*muopt(i)==c, x);
-end
-
-portf=zeros(11,8);
-for i=1:11
+    r = solve(x*RF+(1-x)*muopt(i)==c, x);
+    
     for j=1:8
         if (j<=7)
-            portf(i,j)=v(i)*xopt{i}(j);
+            portf(i,j)=(1-r)*xopt{i}(j);
         else
-            portf(i,j)=v(i);
+            portf(i,j)= r;
         end
     end
 end
+    
 to=zeros(1,10);
 for i=1:10
-    to(i)=abs(sum(portf(i,:)-portf(i+1,:)*100));
+    to(i)=sum(abs(portf(i,:)-portf(i+1,:))*100);
 end
 
 disp(['Average portfolio turnover is ', num2str(mean(to))]);
