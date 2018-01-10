@@ -38,10 +38,10 @@ sigopt=cell(11);
 C = cell(11,1);
 for i=1:11
   [xopt{i}, muopt{i}, sigopt{i}]  = highest_slope_portfolio( ycorrs{i}, RF, ymeans{i}, ystds{i} );
-  figure(i);
+  subplot(4,3,i);
   hold on;
+  title(i);
   plot (sigopt{i}, muopt{i} , 'x');
-  hold on;
   RF_p1 = [0 sigopt{i} 2* sigopt{i}];
   opt1_p = [.01  muopt{i} (2 * muopt{i} - RF) ];
   line(RF_p1, opt1_p  );
@@ -62,7 +62,7 @@ for j=1:11
         std_p(j, i + 2*k * large_n + 1) = sqrt(curr_port' * C{j} * curr_port);
         
     end
-    figure(j)
+    subplot(4,3,j);
     hold on;
     plot( std_p(j,:), mu_p(j,:));
     hold off;
