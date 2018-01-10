@@ -73,7 +73,7 @@ v=zeros(1,11);
 
 for i=1:11
     syms x;
-    v(i)=solve(x*RF+(1-x)*muopt(i)==0.1, x);
+    v(i)=solve(x*RF+(1-x)*muopt(i)==c, x);
 end
 
 portf=zeros(11,8);
