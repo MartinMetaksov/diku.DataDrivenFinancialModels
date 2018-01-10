@@ -31,22 +31,20 @@ end
 RF = .01;
 xopt = cell(11);
 xopt2 = cell(11);
-muopt= cell(11);
-sigopt=cell(11);
-muopt= cell(11);
-sigopt=cell(11);
+muopt = zeros(11,1);
+sigopt = zeros(11,1);
 C = cell(11,1);
 for i=1:11
-  [xopt{i}, muopt{i}, sigopt{i}]  = highest_slope_portfolio( ycorrs{i}, RF, ymeans{i}, ystds{i} );
+  [xopt{i}, muopt(i), sigopt(i)]  = highest_slope_portfolio( ycorrs{i}, RF, ymeans{i}, ystds{i} );
   subplot(4,3,i);
   hold on;
-  title(i);
-  plot (sigopt{i}, muopt{i} , 'x');
-  RF_p1 = [0 sigopt{i} 2* sigopt{i}];
-  opt1_p = [.01  muopt{i} (2 * muopt{i} - RF) ];
+  title(i)
+  plot (sigopt(i), muopt(i) , 'x');
+  RF_p1 = [0 sigopt(i) 2* sigopt(i)];
+  opt1_p = [.01  muopt(i) (2 * muopt(i) - RF) ];
   line(RF_p1, opt1_p  );
   C{i}=diag(ystds{i})*ycorrs{i}*diag(ystds{i});
-  [xopt2{i}, muopt{i}, sigopt{i}]  = highest_slope_portfolio( ycorrs{i}, 0.02, ymeans{i}, ystds{i} );
+  [xopt2{i}, muopt(i), sigopt(i)]  = highest_slope_portfolio( ycorrs{i}, 0.02, ymeans{i}, ystds{i} );
   hold off;
 end
 
