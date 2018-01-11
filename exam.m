@@ -93,26 +93,21 @@ end
 disp(['Average portfolio turnover is ', num2str(mean(to))]);
 
 
-for wi = 10:19 %for year 10-19
+backtest = zeros(10,8);
+for yi = 11:20 %for year 11-20
     
-    LogReturn = zeros(11, length(stocks));
     for si = 1:length(stocks)
-        s = stocks(si);
-        LogReturn(:, si) = log(s.AdjClose(wi*12+2:wi*12+12) ./ s.AdjClose(wi*12+1:wi*12+11));
+        pPrice = s.AdjClose((yi-1)*12);
+        cPrice = s.AdjClose(yi*12);
+        backtest(yi-10, si) = portf(yi-10, si) * (cPrice - pPrice) / pPrice;
     end
-    
-end
-backt=zeros(8,10);
-ilog=LogReturn';
-iport=portf';
-for i= 1:10
-    backt(1:7,i)=ilog(:,i).*iport(1:7,i); %portfolio times logreturns
-    backt(8,i)=iport(8,i)*RF; %Risk free allocation
+    backtest(yi-10, 8) = portf(yi-10, 8) * RF;
 end
 
 %Returns for each year 10-11,11-12... using the portfolios from the asset
 %allocation
-rtrns=sum(backt)
 
+backtest_yearly = sum(backtest, 2);
 
+disp(['Average backtest return is ', num2str(mean(backtest_yearly))]);
 
