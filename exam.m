@@ -67,8 +67,9 @@ for j=1:11
     plot( std_p(j,:), mu_p(j,:));
     hold off;
 end
-
-c=0.3;
+%c represent goal returns for the asset allocation, change this and notice
+%the differences in the backtest
+c=0.3; 
 portf=zeros(11,8);
 
 for i=1:11
