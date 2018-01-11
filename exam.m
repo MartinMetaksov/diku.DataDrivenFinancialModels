@@ -89,5 +89,22 @@ for i=1:10
     to(i)=sum(abs(portf(i,:)-portf(i+1,:))*100);
 end
 
+for wi = 10:19 %for year 10-19
+    
+    LogReturn = zeros(11, length(stocks));
+    for si = 1:length(stocks)
+        s = stocks(si);
+        LogReturn(:, si) = log(s.AdjClose(wi*12+2:wi*12+12) ./ s.AdjClose(wi*12+1:wi*12+11));
+    end
+    
+end
+backt=zeros(8,10);
+ilog=LogReturn';
+iport=portf';
+for i= 1:10
+    backt(1:7,i)=ilog(:,i).*iport(1:7,i); %portfolio times logreturns
+    backt(8,i)=iport(8,i)*RF; %Risk free allocation
+end
 disp(['Average portfolio turnover is ', num2str(mean(to))]);
+
 
