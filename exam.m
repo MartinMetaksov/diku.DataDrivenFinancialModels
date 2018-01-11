@@ -68,7 +68,7 @@ for j=1:11
     hold off;
 end
 
-c=0.1;
+c=0.3;
 portf=zeros(11,8);
 
 for i=1:11
@@ -89,6 +89,9 @@ for i=1:10
     to(i)=sum(abs(portf(i,:)-portf(i+1,:))*100);
 end
 
+disp(['Average portfolio turnover is ', num2str(mean(to))]);
+
+
 for wi = 10:19 %for year 10-19
     
     LogReturn = zeros(11, length(stocks));
@@ -105,6 +108,10 @@ for i= 1:10
     backt(1:7,i)=ilog(:,i).*iport(1:7,i); %portfolio times logreturns
     backt(8,i)=iport(8,i)*RF; %Risk free allocation
 end
-disp(['Average portfolio turnover is ', num2str(mean(to))]);
+
+%Returns for each year 10-11,11-12... using the portfolios from the asset
+%allocation
+rtrns=sum(backt)
+
 
 
