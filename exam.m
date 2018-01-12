@@ -111,3 +111,27 @@ backtest_yearly = sum(backtest, 2);
 
 disp(['Average backtest return is ', num2str(mean(backtest_yearly))]);
 
+% g) beta:
+% use a broad stock index to test, whether our portfolio is inline with the 
+% CAPM prediction
+% collect a broad stock index to test with
+if ~exist('SP', 'var')
+    SP=hist_stock_data('01011998', '01012018','^GSPC','frequency','mo');    
+    SPLR   = log(SP.AdjClose(2:120)    ./ SP.AdjClose(1:119) ); 
+end
+
+Se = zeros(7,1);
+BarR = zeros(7,1);
+X = [ones(size(SPLR)), SPLR];
+b = zeros(7,2);
+
+for i = 1:size(LogReturns, 2)
+    [b(i,:),bint,r,rint,stats] = regress(LogReturns(:, 1), X); 
+    
+    % Get the estimate of the error variance
+    Se(i) = stats(4);
+    
+    % Getting \bar{R}_i
+    BarR(i) = mean(LogReturns(:, i));
+    
+end
