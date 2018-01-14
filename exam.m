@@ -1,4 +1,5 @@
 
+% a) diversification
 % Prevent unnessary loading of data from yahoo finance
 if ~exist('stocks', 'var')
     % Microsoft, Boeing, Bank of America, Exxon Mobil, UnitedHealth Group,
@@ -8,6 +9,7 @@ if ~exist('stocks', 'var')
     stocks = hist_stock_data('01011998', '01012018', tickers, 'frequency', 'mo');
 end
 
+% b) estimate
 % Caclulate log returns with a rolling window of 10 years
 ymeans = cell(1,11);
 ystds = cell(1,11);
@@ -26,7 +28,8 @@ for wi = 0:10
     ycorrs{wi+1} =  corr(LogReturns)';
 end
 
-%calculate the efficient frontiers
+
+% c) efficient frontier
 
 RF = .01;
 xopt = cell(11);
@@ -50,6 +53,7 @@ for i=1:11
     hold off;
 end
 
+% d) Tobin separation
 large_n = 100;
 k = 20;
 mu_p = zeros(4, 4*k* large_n + 1);
@@ -67,6 +71,8 @@ for j=1:11
     plot( std_p(j,:), mu_p(j,:));
     hold off;
 end
+
+% e) asset allocation
 %c represent goal returns for the asset allocation, change this and notice
 %the differences in the backtest
 c=0.3; 
@@ -92,7 +98,7 @@ end
 
 disp(['Average portfolio turnover is ', num2str(mean(to))]);
 
-
+% f) backtest
 backtest = zeros(10,8);
 for yi = 11:20 %for year 11-20
     
@@ -109,6 +115,7 @@ end
 
 backtest_yearly = sum(backtest, 2);
 
+% Show average return and the standard deviation (TODO)
 disp(['Average backtest return is ', num2str(mean(backtest_yearly))]);
 
 % g) beta:
