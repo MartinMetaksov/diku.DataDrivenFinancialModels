@@ -117,6 +117,7 @@ backtest_yearly = sum(backtest, 2);
 
 % Show average return and the standard deviation (TODO)
 disp(['Average backtest return is ', num2str(mean(backtest_yearly))]);
+disp(['Standard deviation of backtest return is ', num2str(sqrt(var(backtest_yearly)))]);
 
 % g) beta:
 % use a broad stock index to test, whether our portfolio is inline with the 
