@@ -1,5 +1,6 @@
 
 % a) diversification
+disp('a) diversification');
 % Prevent unnessary loading of data from yahoo finance
 if ~exist('stocks', 'var')
     % Microsoft, Boeing, Bank of America, Exxon Mobil, UnitedHealth Group,
@@ -10,6 +11,8 @@ if ~exist('stocks', 'var')
 end
 
 % b) estimate
+disp('b) estimate');
+
 % Caclulate log returns with a rolling window of 10 years
 ymeans = cell(1,11);
 ystds = cell(1,11);
@@ -33,6 +36,7 @@ end
 
 % c) efficient frontier
 
+disp('c) efficient frontier');
 RF = .01;
 xopt = cell(11);
 xopt2 = cell(11);
@@ -41,6 +45,7 @@ muopt2 = zeros(11,1);
 sigopt = zeros(11,1);
 sigopt2 = zeros(11,1);
 C = cell(11,1);
+
 for i=1:11
     [xopt{i}, muopt(i), sigopt(i)]  = highest_slope_portfolio( ycorrs{i}, RF, ymeans{i}, ystds{i} );
     subplot(4,3,i);
@@ -56,6 +61,7 @@ for i=1:11
 end
 
 % d) Tobin separation
+disp('d) Tobin separation');
 large_n = 100;
 k = 20;
 mu_p = zeros(4, 4*k* large_n + 1);
@@ -77,7 +83,10 @@ end
 % e) asset allocation
 %c represent goal returns for the asset allocation, change this and notice
 %the differences in the backtest
-c=0.15; 
+disp('e) asset allocation');
+c = 0.15; 
+disp(['Computing optimal portfolios for goal returns of ', num2str(c)]);
+
 portf=zeros(11,8);
 
 for i=1:11
@@ -101,6 +110,7 @@ end
 disp(['Average portfolio turnover is ', num2str(mean(to))]);
 
 % f) backtest
+disp('f) backtest');
 backtest = zeros(10,8);
 for yi = 11:20 %for year 11-20
     
@@ -121,23 +131,36 @@ backtest_yearly_avg = mean(backtest_yearly);
 backtest_yearly_dev = sqrt(var(backtest_yearly));
 
 % Show average return and the standard deviation 
-disp(['Average backtest return is ', num2str(backtest_yearly_avg)]);
-disp(['Standard deviation of backtest return is ', num2str(backtest_yearly_dev)]);
+disp(['Average portfolio return is ', num2str(backtest_yearly_avg)]);
+disp(['Standard deviation is ', num2str(backtest_yearly_dev)]);
 
 % g) beta:
 % use a broad stock index to test, whether our portfolio is inline with the 
 % CAPM prediction
 % collect a broad stock index to test with
+disp('g) beta');
 if ~exist('SP', 'var')
     SP = hist_stock_data('01122007', '01012018','^GSPC','frequency','mo');    
 end
 
 SPLR = log(SP.AdjClose(13:12:end) ./ SP.AdjClose(1:12:end-12));
 
-X = [ones(size(SPLR)), SPLR];
+% Compute return on market
+RM = mean(SPLR);
+disp(['Average S&P market return is ', num2str(RM)]);
 
+disp('Computing linear regression of the portfolio and S&P');
+X = [ones(size(SPLR)), SPLR];
 [b,bint,r,rint,stats] = regress(backtest_yearly, X); 
 
-% Get the estimate of the error variance
-Se = stats(4);
+disp(['Betas are ', num2str(b')]);
+
+% Calculate portfolio return using CAPM prediction
+RP_test = RF + (RM - RF) * b(2);
+disp(['Portfolio return using CAPM prediction is ', num2str(RP_test)]);
+
+% Calculate Jensen's alpha (differential return)
+alpha = backtest_yearly_avg - RP_test;
+disp(['Differential return (alpha) is ', num2str(alpha)]);
+
 
