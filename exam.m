@@ -75,7 +75,7 @@ end
 % e) asset allocation
 %c represent goal returns for the asset allocation, change this and notice
 %the differences in the backtest
-c=0.3; 
+c=0.15; 
 portf=zeros(11,8);
 
 for i=1:11
@@ -103,9 +103,10 @@ backtest = zeros(10,8);
 for yi = 11:20 %for year 11-20
     
     for si = 1:length(stocks)
-        pPrice = s.AdjClose((yi-1)*12);
+        s = stocks(si);
         cPrice = s.AdjClose(yi*12);
-        backtest(yi-10, si) = portf(yi-10, si) * (cPrice - pPrice) / pPrice;
+        pPrice = s.AdjClose((yi-1)*12);
+        backtest(yi-10, si) = portf(yi-10, si) * log(cPrice / pPrice);
     end
     backtest(yi-10, 8) = portf(yi-10, 8) * RF;
 end
@@ -114,32 +115,27 @@ end
 %allocation
 
 backtest_yearly = sum(backtest, 2);
+backtest_yearly_avg = mean(backtest_yearly);
+backtest_yearly_dev = sqrt(var(backtest_yearly));
 
-% Show average return and the standard deviation (TODO)
-disp(['Average backtest return is ', num2str(mean(backtest_yearly))]);
-disp(['Standard deviation of backtest return is ', num2str(sqrt(var(backtest_yearly)))]);
+% Show average return and the standard deviation 
+disp(['Average backtest return is ', num2str(backtest_yearly_avg)]);
+disp(['Standard deviation of backtest return is ', num2str(backtest_yearly_dev)]);
 
 % g) beta:
 % use a broad stock index to test, whether our portfolio is inline with the 
 % CAPM prediction
 % collect a broad stock index to test with
 if ~exist('SP', 'var')
-    SP=hist_stock_data('01011998', '01012018','^GSPC','frequency','mo');    
-    SPLR   = log(SP.AdjClose(2:120)    ./ SP.AdjClose(1:119) ); 
+    SP = hist_stock_data('01122007', '01012018','^GSPC','frequency','mo');    
 end
 
-Se = zeros(7,1);
-BarR = zeros(7,1);
+SPLR = log(SP.AdjClose(13:12:end) ./ SP.AdjClose(1:12:end-12));
+
 X = [ones(size(SPLR)), SPLR];
-b = zeros(7,2);
 
-for i = 1:size(LogReturns, 2)
-    [b(i,:),bint,r,rint,stats] = regress(LogReturns(:, 1), X); 
-    
-    % Get the estimate of the error variance
-    Se(i) = stats(4);
-    
-    % Getting \bar{R}_i
-    BarR(i) = mean(LogReturns(:, i));
-    
-end
+[b,bint,r,rint,stats] = regress(backtest_yearly, X); 
+
+% Get the estimate of the error variance
+Se = stats(4);
+
