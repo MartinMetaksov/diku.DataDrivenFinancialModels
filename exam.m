@@ -6,7 +6,7 @@ if ~exist('stocks', 'var')
     % Pepsico, NextEra Energy
     tickers = {'MSFT' 'BA' 'BAC' 'XOM' 'UNH' 'PEP' 'NEE'};
     
-    stocks = hist_stock_data('01011998', '01012018', tickers, 'frequency', 'mo');
+    stocks = hist_stock_data('01121997', '01012018', tickers, 'frequency', 'mo');
 end
 
 % b) estimate
@@ -15,17 +15,19 @@ ymeans = cell(1,11);
 ystds = cell(1,11);
 ycorrs = cell(1,11);
 
-for wi = 0:10
+for wi = 1:11
     
-    LogReturns = zeros(119, length(stocks));
+    LogReturns = zeros(120, length(stocks));
     for si = 1:length(stocks)
         s = stocks(si);
-        LogReturns(:, si) = log(s.AdjClose(wi*12+2:wi*12+120) ./ s.AdjClose(wi*12+1:wi*12+119));
+        pPrice = s.AdjClose((wi-1)*12+1:(wi+9)*12);
+        cPrice = s.AdjClose((wi-1)*12+2:(wi+9)*12+1);
+        LogReturns(:, si) = log(cPrice ./ pPrice);
     end
     
-    ymeans{wi+1} = 12 * mean(LogReturns)';
-    ystds{wi+1} = sqrt (12 * var(LogReturns))';
-    ycorrs{wi+1} =  corr(LogReturns)';
+    ymeans{wi} = 12 * mean(LogReturns)';
+    ystds{wi} = sqrt (12 * var(LogReturns))';
+    ycorrs{wi} =  corr(LogReturns)';
 end
 
 
