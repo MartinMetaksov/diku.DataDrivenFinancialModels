@@ -150,8 +150,10 @@ RM = mean(SPLR);
 disp(['Average S&P market return is ', num2str(RM)]);
 
 disp('Computing linear regression of the portfolio and S&P');
-X = [ones(size(SPLR)), SPLR];
-[b,bint,r,rint,stats] = regress(backtest_yearly, X); 
+RmtmRft = SPLR - RF;
+RitmRft = backtest_yearly - RF;
+X = [ones(size(RmtmRft)), RmtmRft];
+[b,bint,r,rint,stats] = regress(RitmRft, X); 
 
 disp(['Betas are ', num2str(b')]);
 
@@ -159,8 +161,34 @@ disp(['Betas are ', num2str(b')]);
 RP_test = RF + (RM - RF) * b(2);
 disp(['Portfolio return using CAPM prediction is ', num2str(RP_test)]);
 
-% Calculate Jensen's alpha (differential return)
+% Calculate Jensen's alpha
 alpha = backtest_yearly_avg - RP_test;
-disp(['Differential return (alpha) is ', num2str(alpha)]);
+disp(['Jensen''s alpha is ', num2str(alpha)]);
 
+% i) timing
+% Calculate Treynor-Mazuy measure
+% (Rit - RFt ) = ai + bi (Rmt - RFt ) + ci (Rmt - RFt)^2 + eit
+disp('i) timing');
+
+RmtmRft2 = RmtmRft.^2;
+
+X2 = [ones(length(RmtmRft),1), RmtmRft, RmtmRft2];
+
+[b2,bint2,r2,rint2,stats2] = regress(RitmRft, X2);
+
+disp(['Regression result is ', num2str(b2')]);
+
+figure
+scatter(SPLR, backtest_yearly)
+title('Timing')
+xlabel('R_m')
+ylabel('R_i')
+hold on
+axis manual
+syms x;
+f1 = b(1) + b(2) * x;
+f2 = b2(1) + b2(2) * x + b2(3) * x^2;
+fplot(f1);
+fplot(f2);
+hold off
 
