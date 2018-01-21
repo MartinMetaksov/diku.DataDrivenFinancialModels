@@ -28,9 +28,9 @@ for i = 1:BLength
     C = b.COUPON * face / 100;
     syms y;
     ytm_eqns = sym(zeros(b.MATURITY+1,1));
-    for t = 1:b.MATURITY
+    for t = 1:(b.MATURITY*2)
         ytm_eqns(t) = C / (1 + y/2)^t;
-        if t == b.MATURITY
+        if t == (b.MATURITY*2)
             ytm_eqns(t+1) = (face) / (1+y/2)^t;
         end
     end
@@ -43,10 +43,10 @@ for i = 1:BLength
     % Duration and convexity
     D = 0;
     DC = 0;
-    for t = 1:b.MATURITY
+    for t = 1:(b.MATURITY*2)
         D = D + (t * C)/(1 + ytm / 2)^t;
         DC = DC + (t * (t + 1) * C)/(1 + ytm / 2)^t;
-        if (t == b.MATURITY)
+        if (t == (b.MATURITY*2))
             D = D + (t * face) / (1 + ytm / 2)^t ;
             DC = DC + (t * (t + 1) * C)/(1 + ytm / 2)^t;
         end
@@ -92,9 +92,9 @@ for i = 1:BLength
     C = b.COUPON * face / 100;
     New_YTM = b.YTM + dY;
     P = 0; 
-    for t = 1:b.MATURITY
+    for t = 1:(b.MATURITY*2)
         P = P + C / (1 + New_YTM / 2)^t;
-        if t == b.MATURITY
+        if t == (b.MATURITY*2)
             P = P + (face) / (1+ New_YTM / 2)^t;
         end
     end
@@ -102,6 +102,11 @@ for i = 1:BLength
 end
 
 NewPortfolioPrice = PortfolioAmounts' * NBP;
-diff = PortfolioPrice - NewPortfolioPrice;
-decrease = diff / PortfolioPrice * 100;
-fprintf('old portfolio price - new portfolio price = $%s, which is a decrease of %s%%\n', num2str(diff), num2str(decrease));
+s = PortfolioPrice - NewPortfolioPrice;
+diff = abs(s);
+change = diff / PortfolioPrice * 100;
+change_s = 'a decrease';
+if diff < 0
+    change_s = 'an increase';
+end
+fprintf('old portfolio price - new portfolio price = $%s, which is %s of %s%%\n', num2str(diff), change_s,num2str(change));
