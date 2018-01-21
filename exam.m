@@ -1,14 +1,18 @@
 
 % a) diversification
 disp('a) diversification');
+
+% Microsoft, Boeing, Bank of America, Exxon Mobil, UnitedHealth Group,
+% Pepsico, NextEra Energy
+tickers = {'MSFT' 'BA' 'BAC' 'XOM' 'UNH' 'PEP' 'NEE'};
+date_start = '01121997';
+date_end = '31122017';
+
 % Prevent unnessary loading of data from yahoo finance
 if ~exist('stocks', 'var')
-    % Microsoft, Boeing, Bank of America, Exxon Mobil, UnitedHealth Group,
-    % Pepsico, NextEra Energy
-    tickers = {'MSFT' 'BA' 'BAC' 'XOM' 'UNH' 'PEP' 'NEE'};
-    
-    stocks = hist_stock_data('01121997', '01012018', tickers, 'frequency', 'mo');
+    stocks = hist_stock_data(date_start, date_end, tickers, 'frequency', 'mo');
 end
+disp(['Collected stock data (', date_start, ' - ', date_end, ') of ', strjoin(tickers)]);
 
 % b) estimate
 disp('b) estimate');
@@ -32,11 +36,13 @@ for wi = 1:11
     ystds{wi} = sqrt (12 * var(LogReturns))';
     ycorrs{wi} =  corr(LogReturns)';
 end
-
+disp(['Estimated expected yearly returns for ', num2str(length(ymeans)), ' windows with ', num2str(length(stocks)), ' stocks']);
 
 % c) efficient frontier
-
+% d) Tobin separation
 disp('c) efficient frontier');
+disp('d) Tobin separation');
+
 RF = .01;
 xopt = cell(11);
 xopt2 = cell(11);
@@ -46,22 +52,25 @@ sigopt = zeros(11,1);
 sigopt2 = zeros(11,1);
 C = cell(11,1);
 
+figure('Name', 'Efficient Frontier');
 for i=1:11
     [xopt{i}, muopt(i), sigopt(i)]  = highest_slope_portfolio( ycorrs{i}, RF, ymeans{i}, ystds{i} );
     subplot(4,3,i);
-    hold on;
+    hold on
     title(i)
-    plot (sigopt(i), muopt(i) , 'x');
+    xlim([0, 0.5])
+    ylim([-0.2, 0.4])
+    xlabel('\sigma_p')
+    ylabel('$\bar{R}_p$','Interpreter','Latex')
+    plot(sigopt(i), muopt(i) , 'x')
     RF_p1 = [0 sigopt(i) 2* sigopt(i)];
     opt1_p = [.01  muopt(i) (2 * muopt(i) - RF) ];
     line(RF_p1, opt1_p  );
     C{i}=diag(ystds{i})*ycorrs{i}*diag(ystds{i});
     [xopt2{i}, muopt2(i), sigopt2(i)]  = highest_slope_portfolio( ycorrs{i}, 0.02, ymeans{i}, ystds{i} );
-    hold off;
+    hold off
 end
 
-% d) Tobin separation
-disp('d) Tobin separation');
 large_n = 100;
 k = 20;
 mu_p = zeros(4, 4*k* large_n + 1);
@@ -75,10 +84,11 @@ for j=1:11
         
     end
     subplot(4,3,j);
-    hold on;
+    hold on
     plot( std_p(j,:), mu_p(j,:));
-    hold off;
+    hold off
 end
+disp(['Plotted ', num2str(length(ymeans)), ' efficient frontiers with Tobin separation and risk free rate ', num2str(RF)]);
 
 % e) asset allocation
 %c represent goal returns for the asset allocation, change this and notice
@@ -178,7 +188,7 @@ X2 = [ones(length(RmtmRft),1), RmtmRft, RmtmRft2];
 
 disp(['Regression result is ', num2str(b2')]);
 
-figure
+figure('Name', 'Timing')
 scatter(SPLR, backtest_yearly)
 title('Timing')
 xlabel('R_m')
@@ -190,5 +200,6 @@ f1 = b(1) + b(2) * x;
 f2 = b2(1) + b2(2) * x + b2(3) * x^2;
 fplot(f1);
 fplot(f2);
+legend('Annual returns', sprintf('y = %0.2f %+0.2fx', b), sprintf('y = %0.2f %+0.2fx %+0.2fx^2', b2))
 hold off
 
