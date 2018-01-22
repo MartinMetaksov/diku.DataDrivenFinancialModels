@@ -72,7 +72,6 @@ end
 %    if EUR 100.000,-- is invested in each of them
 PortfolioPrice   = 100000 * EUR_TO_USD_RATE * 5;
 PortfolioWeights = ones(BLength,1)/BLength;
-PortfolioAmounts = PortfolioPrice * PortfolioWeights ./ [Bonds.PRICE]';
 
 PortfolioDuration  = PortfolioWeights' * [Bonds.DURATION_MACULAY]';
 PortfolioConvexity = PortfolioWeights' * [Bonds.CONVEXITY]';
@@ -81,11 +80,8 @@ PortfolioConvexity = PortfolioWeights' * [Bonds.CONVEXITY]';
 % c) Estimate the potential decline in the market value of your portfolio, 
 %    if the yield increases by 150 basis points.
 dY = 0.015; % 150 points
-PercentApprox1 = -PortfolioDuration * dY * 100;
-PercentApprox2 =  PercentApprox1 + PortfolioConvexity*dY^2*100/2.0;
-PriceApprox1  =  PortfolioPrice + PercentApprox1 * PortfolioPrice/100; 
-PriceApprox2  =  PortfolioPrice + PercentApprox2 * PortfolioPrice/100;
-
+PortfolioAmounts = PortfolioPrice * PortfolioWeights ./ [Bonds.PRICE]';
+m
 NBP = zeros(BLength, 1);
 for i = 1:BLength
     b = Bonds(i);
